@@ -310,6 +310,7 @@ nuisance_corrections:
     - true
     space: template
 pipeline_setup:
+  freesurfer_dir: /ocean/projects/med220004p/trogers1/many_pipelines/freesurfer/outputs/ABCD_all_subjects
   Amazon-AWS:
     aws_output_bucket_credentials: null
     s3_encryption: true
@@ -360,7 +361,7 @@ pipeline_setup:
     random_seed: 77742777
   working_directory:
     path: /outputs/working
-    remove_working_dir: true
+    remove_working_dir: false
 post_processing:
   spatial_smoothing:
     fwhm:
@@ -388,7 +389,6 @@ registration_workflows:
     T1w_template: $FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}.nii.gz
     overwrite_transform:
       run: false
-      using: FSL
     reg_with_skull: false
     registration:
       ANTs:
@@ -456,10 +456,9 @@ registration_workflows:
         identity_matrix: $FSLDIR/etc/flirtsch/ident.mat
         interpolation: trilinear
         ref_mask: $FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask_dil.nii.gz
-        ref_mask_res-2: $FSLDIR/data/standard/MNI152_T1_2mm_brain_mask_dil.nii.gz
         ref_resolution: 2mm
       using:
-      - FSL
+      - ANTS
     resolution_for_anat: 2mm
     run: true
   functional_registration:
@@ -494,8 +493,6 @@ registration_workflows:
           func_reg_input_volume: 0
         input:
         - fmriprep_reference
-        reg_with_skull: false
-      input: brain
       interpolation: trilinear
       run: true
       using: FSL
@@ -596,11 +593,6 @@ surface_analysis:
     run: false
     surface_parcellation_template: /cpac_templates/Schaefer2018_200Parcels_17Networks_order.dlabel.nii
 timeseries_extraction:
-  connectivity_matrix:
-    measure:
-    - Pearson
-    using:
-    - Nilearn
   realignment: ROI_to_func
   run: true
   tse_roi_paths:
