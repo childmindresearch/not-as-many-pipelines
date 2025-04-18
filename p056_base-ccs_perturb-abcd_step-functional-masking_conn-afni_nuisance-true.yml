@@ -1,0 +1,698 @@
+PyPEER:
+  data_scan_names: []
+  eye_mask_path: $FSLDIR/data/standard/MNI152_T1_${func_resolution}_eye_mask.nii.gz
+  eye_scan_names: []
+  minimal_nuisance_correction:
+    peer_gsr: true
+    peer_scrub: false
+    scrub_thresh: 0.2
+  run: false
+  stimulus_path: null
+amplitude_low_frequency_fluctuation:
+  highpass_cutoff:
+  - 0.01
+  lowpass_cutoff:
+  - 0.1
+  run: false
+  target_space:
+  - Native
+anatomical_preproc:
+  acpc_alignment:
+    FOV_crop: robustfov
+    T1w_ACPC_template: $FSLDIR/data/standard/MNI152_T1_1mm.nii.gz
+    T1w_brain_ACPC_template: $FSLDIR/data/standard/MNI152_T1_1mm_brain.nii.gz
+    T2w_ACPC_template: null
+    T2w_brain_ACPC_template: null
+    acpc_target: whole-head
+    align_brain_mask: false
+    brain_size: 150
+    run: false
+    run_before_preproc: true
+  brain_extraction:
+    AFNI-3dSkullStrip:
+      NN_smooth: 72
+      avoid_eyes: true
+      avoid_vent: true
+      blur_fwhm: 0
+      exp_frac: 0.1
+      fac: 1
+      fill_hole: 10
+      mask_vol: false
+      max_inter_iter: 4
+      monkey: false
+      n_iterations: 250
+      perc_int: 0
+      push_to_edge: false
+      pushout: true
+      shrink_factor: 0.6
+      shrink_factor_bot_lim: 0.4
+      smooth_final: 20
+      touchup: true
+      use_edge: true
+      use_skull: false
+      var_shrink_fac: true
+    FSL-BET:
+      Robustfov: false
+      frac: 0.5
+      mesh_boolean: false
+      outline: false
+      padding: false
+      radius: 0
+      reduce_bias: false
+      remove_eyes: false
+      robust: false
+      skull: false
+      surfaces: false
+      threshold: false
+      vertical_gradient: 0.0
+    FreeSurfer-BET:
+      T1w_brain_template_mask_ccs: /code/CPAC/resources/templates/MNI152_T1_1mm_first_brain_mask.nii.gz
+    UNet:
+      unet_model: s3://fcp-indi/resources/cpac/resources/Site-All-T-epoch_36.model
+    niworkflows-ants:
+      mask_path: /ants_template/oasis/T_template0_BrainCerebellumProbabilityMask.nii.gz
+      regmask_path: /ants_template/oasis/T_template0_BrainCerebellumRegistrationMask.nii.gz
+      template_path: /ants_template/oasis/T_template0.nii.gz
+    run: true
+    using:
+    - FreeSurfer-BET-Tight
+    - FreeSurfer-BET-Loose
+    - FreeSurfer-Brainmask
+  n4_bias_field_correction:
+    run:
+    - false
+    shrink_factor: 2
+  non_local_means_filtering:
+    noise_model: Gaussian
+    run:
+    - true
+  run: true
+  run_t2: false
+  t1t2_bias_field_correction:
+    BiasFieldSmoothingSigma: 5
+    run: false
+functional_preproc:
+  coreg_prep:
+    run: true
+  despiking:
+    run:
+    - true
+    space: native
+  distortion_correction:
+    Blip-FSL-TOPUP:
+      estmov: 1
+      fwhm: 8
+      interp: spline
+      lambda: 1
+      minmet: 0
+      miter: 5
+      numprec: double
+      regmod: bending_energy
+      regrid: 1
+      scale: 0
+      splineorder: 3
+      ssqlambda: 1
+      subsamp: 1
+      warpres: 10
+    PhaseDiff:
+      fmap_skullstrip_AFNI_threshold: 0.6
+      fmap_skullstrip_BET_frac: 0.5
+      fmap_skullstrip_option: BET
+    run:
+    - true
+    using:
+    - PhaseDiff
+    - Blip
+  func_masking:
+    Anatomical_Refined:
+      anatomical_mask_dilation: false
+    FSL-BET:
+      frac: 0.3
+      functional_mean_bias_correction: false
+      functional_mean_boolean: false
+      functional_mean_thr:
+        run: false
+        threshold_value: 98
+      mesh_boolean: false
+      outline: false
+      padding: false
+      radius: 0
+      reduce_bias: false
+      remove_eyes: false
+      robust: false
+      skull: false
+      surfaces: false
+      threshold: false
+      vertical_gradient: 0.0
+    FSL_AFNI:
+      bold_ref: null
+      brain_mask: $FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask.nii.gz
+      brain_probseg: $FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask.nii.gz
+    apply_func_mask_in_native_space: false
+    run: true
+    using:
+    - Anatomical_Resampled
+  generate_func_mean:
+    run: true
+  motion_estimates_and_correction:
+    motion_correction:
+      AFNI-3dvolreg:
+        functional_volreg_twopass: true
+      motion_correction_reference:
+      - mean
+      motion_correction_reference_volume: 0
+      using:
+      - 3dvolreg
+    motion_estimate_filter:
+      filters: []
+      run:
+      - false
+    motion_estimates:
+      calculate_motion_after: true
+      calculate_motion_first: false
+    run: true
+  normalize_func:
+    run: true
+  run: true
+  scaling:
+    run: false
+    scaling_factor: 10
+  slice_timing_correction:
+    run:
+    - true
+    tpattern: alt+z
+    tzero: 0
+  truncation:
+    start_tr: 0
+    stop_tr: null
+  update_header:
+    run: true
+longitudinal_template_generation:
+  average_method: median
+  convergence_threshold: -1
+  cost: corratio
+  dof: 12
+  interp: trilinear
+  run: false
+  thread_pool: 2
+network_centrality:
+  degree_centrality:
+    correlation_threshold: 0.001
+    correlation_threshold_option: Sparsity threshold
+    weight_options: []
+  eigenvector_centrality:
+    correlation_threshold: 0.001
+    correlation_threshold_option: Sparsity threshold
+    weight_options: []
+  local_functional_connectivity_density:
+    correlation_threshold: 0.6
+    correlation_threshold_option: Correlation threshold
+    weight_options: []
+  memory_allocation: 1.0
+  run: false
+  template_specification_file: /cpac_templates/Mask_ABIDE_85Percent_GM.nii.gz
+nuisance_corrections:
+  1-ICA-AROMA:
+    denoising_type: nonaggr
+    run:
+    - false
+  2-nuisance_regression:
+    Regressors:
+    - Bandpass:
+        bottom_frequency: 0.01
+        method: AFNI
+        top_frequency: 0.1
+      CerebrospinalFluid:
+        erode_mask: false
+        extraction_resolution: 2
+        summary: Mean
+      GlobalSignal:
+        summary: Mean
+      Motion:
+        include_delayed: true
+        include_delayed_squared: true
+        include_squared: true
+      Name: Regressor_1
+      PolyOrt:
+        degree: 1
+      WhiteMatter:
+        erode_mask: false
+        extraction_resolution: 2
+        summary: Mean
+    - Bandpass:
+        bottom_frequency: 0.01
+        method: AFNI
+        top_frequency: 0.1
+      CerebrospinalFluid:
+        erode_mask: false
+        extraction_resolution: 2
+        summary: Mean
+      Motion:
+        include_delayed: true
+        include_delayed_squared: true
+        include_squared: true
+      Name: Regressor_2
+      PolyOrt:
+        degree: 1
+      WhiteMatter:
+        erode_mask: false
+        extraction_resolution: 2
+        summary: Mean
+    bandpass_filtering_order: After
+    create_regressors: true
+    ingress_regressors:
+      Regressors:
+        Columns:
+        - global_signal
+        Name: default
+      run: false
+    lateral_ventricles_mask: $FSLDIR/data/atlases/HarvardOxford/HarvardOxford-lateral-ventricles-thr25-2mm.nii.gz
+    regressor_masks:
+      erode_anatomical_brain_mask:
+        brain_erosion_mm: null
+        brain_mask_erosion_mm: 30
+        brain_mask_erosion_prop: null
+        run: false
+      erode_csf:
+        csf_erosion_mm: null
+        csf_erosion_prop: null
+        csf_mask_erosion_mm: 30
+        run: false
+      erode_gm:
+        gm_erosion_mm: null
+        gm_erosion_prop: 0.6
+        gm_mask_erosion_mm: null
+        run: false
+      erode_wm:
+        run: false
+        wm_erosion_mm: null
+        wm_erosion_prop: 0.6
+        wm_mask_erosion_mm: null
+    run:
+    - true
+    space: native
+pipeline_setup:
+  Amazon-AWS:
+    aws_output_bucket_credentials: null
+    s3_encryption: false
+  Debugging:
+    verbose: false
+  crash_log_directory:
+    path: /outputs/crash
+  log_directory:
+    graphviz:
+      entire_workflow:
+        format: []
+        generate: false
+        graph2use: []
+        simple_form: true
+    path: /outputs/logs
+    run_logging: true
+  outdir_ingress:
+    run: false
+  output_directory:
+    output_tree: default
+    path: /outputs/output
+    pull_source_once: true
+    quality_control:
+      generate_quality_control_images: true
+      generate_xcpqc_files: false
+    source_outputs_dir: null
+    write_debugging_outputs: false
+    write_func_outputs: true
+  pipeline_name: p056_base-ccs_perturb-abcd_step-functional-masking_conn-afni_nuisance-true
+  system_config:
+    FSLDIR: FSLDIR
+    fail_fast: false
+    max_cores_per_participant: 1
+    maximum_memory_per_participant: 10.0
+    num_OMP_threads: 1
+    num_ants_threads: 1
+    num_participants_at_once: 1
+    observed_usage:
+      buffer: 10
+      callback_log: null
+    on_grid:
+      SGE:
+        parallel_environment: mpi_smp
+        queue: all.q
+      resource_manager: SGE
+      run: false
+    raise_insufficient: true
+    random_seed: null
+  working_directory:
+    path: /outputs/working
+    remove_working_dir: true
+post_processing:
+  spatial_smoothing:
+    fwhm:
+    - 4
+    output:
+    - smoothed
+    run: false
+    smoothing_method:
+    - FSL
+  z-scoring:
+    output:
+    - z-scored
+    run: false
+regional_homogeneity:
+  cluster_size: 27
+  run: false
+  target_space:
+  - Native
+registration_workflows:
+  anatomical_registration:
+    T1w_brain_template: $FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain.nii.gz
+    T1w_brain_template_mask: /opt/dcan-tools/pipeline/global/templates/MNI152_T1_${resolution_for_anat}_brain_mask.nii.gz
+    T1w_template: $FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}.nii.gz
+    overwrite_transform:
+      run: false
+      using: FSL
+    reg_with_skull: false
+    registration:
+      ANTs:
+        T1_registration:
+        - collapse-output-transforms: 0
+        - dimensionality: 3
+        - initial-moving-transform:
+            initializationFeature: 0
+        - transforms:
+          - Rigid:
+              convergence:
+                convergenceThreshold: 1e-08
+                convergenceWindowSize: 10
+                iteration: 1000x500x250x100
+              gradientStep: 0.1
+              metric:
+                metricWeight: 1
+                numberOfBins: 32
+                samplingPercentage: 0.25
+                samplingStrategy: Regular
+                type: MI
+              shrink-factors: 8x4x2x1
+              smoothing-sigmas: 3.0x2.0x1.0x0.0
+              use-histogram-matching: true
+          - Affine:
+              convergence:
+                convergenceThreshold: 1e-08
+                convergenceWindowSize: 10
+                iteration: 1000x500x250x100
+              gradientStep: 0.1
+              metric:
+                metricWeight: 1
+                numberOfBins: 32
+                samplingPercentage: 0.25
+                samplingStrategy: Regular
+                type: MI
+              shrink-factors: 8x4x2x1
+              smoothing-sigmas: 3.0x2.0x1.0x0.0
+              use-histogram-matching: true
+          - SyN:
+              convergence:
+                convergenceThreshold: 1e-09
+                convergenceWindowSize: 15
+                iteration: 100x100x70x20
+              gradientStep: 0.1
+              metric:
+                metricWeight: 1
+                radius: 4
+                type: CC
+              shrink-factors: 6x4x2x1
+              smoothing-sigmas: 3.0x2.0x1.0x0.0
+              totalFieldVarianceInVoxelSpace: 0.0
+              updateFieldVarianceInVoxelSpace: 3.0
+              use-histogram-matching: true
+              winsorize-image-intensities:
+                lowerQuantile: 0.01
+                upperQuantile: 0.99
+        interpolation: LanczosWindowedSinc
+        use_lesion_mask: false
+      FSL-FNIRT:
+        FNIRT_T1w_brain_template: null
+        FNIRT_T1w_template: null
+        T1w_template_res-2: $FSLDIR/data/standard/MNI152_T1_2mm.nii.gz
+        fnirt_config: T1_2_MNI152_2mm
+        identity_matrix: $FSLDIR/etc/flirtsch/ident.mat
+        interpolation: trilinear
+        ref_mask: $FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask_dil.nii.gz
+        ref_mask_res-2: $FSLDIR/data/standard/MNI152_T1_2mm_brain_mask_dil.nii.gz
+        ref_resolution: 2mm
+      using:
+      - FSL
+    resolution_for_anat: 2mm
+    run: true
+  functional_registration:
+    EPI_registration:
+      ANTs:
+        interpolation: LanczosWindowedSinc
+        parameters:
+        - collapse-output-transforms: 0
+        - dimensionality: 3
+        - initial-moving-transform:
+            initializationFeature: 0
+        - transforms:
+          - Rigid:
+              convergence:
+                convergenceThreshold: 1e-08
+                convergenceWindowSize: 10
+                iteration: 1000x500x250x100
+              gradientStep: 0.1
+              metric:
+                metricWeight: 1
+                numberOfBins: 32
+                samplingPercentage: 0.25
+                samplingStrategy: Regular
+                type: MI
+              shrink-factors: 8x4x2x1
+              smoothing-sigmas: 3.0x2.0x1.0x0.0
+              use-histogram-matching: true
+          - Affine:
+              convergence:
+                convergenceThreshold: 1e-08
+                convergenceWindowSize: 10
+                iteration: 1000x500x250x100
+              gradientStep: 0.1
+              metric:
+                metricWeight: 1
+                numberOfBins: 32
+                samplingPercentage: 0.25
+                samplingStrategy: Regular
+                type: MI
+              shrink-factors: 8x4x2x1
+              smoothing-sigmas: 3.0x2.0x1.0x0.0
+              use-histogram-matching: true
+          - SyN:
+              convergence:
+                convergenceThreshold: 1e-09
+                convergenceWindowSize: 15
+                iteration: 100x100x70x20
+              gradientStep: 0.1
+              metric:
+                metricWeight: 1
+                radius: 4
+                type: CC
+              shrink-factors: 6x4x2x1
+              smoothing-sigmas: 3.0x2.0x1.0x0.0
+              totalFieldVarianceInVoxelSpace: 0.0
+              updateFieldVarianceInVoxelSpace: 3.0
+              use-histogram-matching: true
+              winsorize-image-intensities:
+                lowerQuantile: 0.01
+                upperQuantile: 0.99
+      EPI_template: s3://fcp-indi/resources/cpac/resources/epi_hbn.nii.gz
+      EPI_template_mask: null
+      FSL-FNIRT:
+        fnirt_config: T1_2_MNI152_2mm
+        identity_matrix: $FSLDIR/etc/flirtsch/ident.mat
+        interpolation: sinc
+      run: false
+      using:
+      - ANTS
+    coregistration:
+      arguments: null
+      boundary_based_registration:
+        bbr_schedule: $FSLDIR/etc/flirtsch/bbr.sch
+        bbr_wm_map: probability_map
+        bbr_wm_mask_args: -thr 0.5 -bin
+        reference: whole-head
+        run:
+        - true
+      cost: corratio
+      dof: 6
+      func_input_prep:
+        Mean Functional:
+          n4_correct_func: false
+        Selected Functional Volume:
+          func_reg_input_volume: 7
+        input:
+        - Selected_Functional_Volume
+        reg_with_skull: false
+      input: brain
+      interpolation: trilinear
+      run: true
+      using: FSL
+    func_registration_to_template:
+      ANTs_pipelines:
+        interpolation: LanczosWindowedSinc
+      FNIRT_pipelines:
+        identity_matrix: $FSLDIR/etc/flirtsch/ident.mat
+        interpolation: trilinear
+      apply_transform:
+        using: default
+      output_resolution:
+        func_derivative_outputs: 3mm
+        func_preproc_outputs: 3mm
+      run: true
+      run_EPI: false
+      target_template:
+        EPI_template:
+          EPI_template_for_resample: $FSLDIR/data/standard/MNI152_T1_1mm_brain.nii.gz
+          EPI_template_funcreg: s3://fcp-indi/resources/cpac/resources/epi_hbn.nii.gz
+          EPI_template_mask_funcreg: null
+        T1_template:
+          T1w_brain_template_funcreg: $FSLDIR/data/standard/MNI152_T1_${func_resolution}_brain.nii.gz
+          T1w_brain_template_mask_funcreg: $FSLDIR/data/standard/MNI152_T1_${func_resolution}_brain_mask.nii.gz
+          T1w_template_for_resample: $FSLDIR/data/standard/MNI152_T1_1mm_brain.nii.gz
+          T1w_template_funcreg: $FSLDIR/data/standard/MNI152_T1_${func_resolution}.nii.gz
+        using:
+        - T1_template
+seed_based_correlation_analysis:
+  norm_timeseries_for_DR: true
+  run: false
+  sca_roi_paths:
+    /cpac_templates/CC400.nii.gz: Avg
+segmentation:
+  run: true
+  tissue_segmentation:
+    ANTs_Prior_Based:
+      CSF_label:
+      - 24
+      GM_label:
+      - 3
+      - 42
+      WM_label:
+      - 2
+      - 41
+      template_brain_list:
+      - /cpac_templates/MacaqueYerkes19_T1w_0.5mm_desc-JLC_T1w_brain.nii.gz
+      - /cpac_templates/J_Macaque_11mo_atlas_nACQ_194x252x160space_0.5mm_desc-JLC_T1w_brain.nii.gz
+      template_segmentation_list:
+      - /cpac_templates/MacaqueYerkes19_T1w_0.5mm_desc-JLC_Segmentation.nii.gz
+      - /cpac_templates/J_Macaque_11mo_atlas_nACQ_194x252x160space_0.5mm_desc-JLC_Segmentation.nii.gz
+    FSL-FAST:
+      thresholding:
+        Custom:
+          CSF_threshold_value: 0.95
+          GM_threshold_value: 0.95
+          WM_threshold_value: 0.95
+        use: Auto
+      use_priors:
+        CSF_path: $priors_path/avg152T1_csf_bin.nii.gz
+        GM_path: $priors_path/avg152T1_gray_bin.nii.gz
+        WM_path: $priors_path/avg152T1_white_bin.nii.gz
+        priors_path: $FSLDIR/data/standard/tissuepriors/2mm
+        run: true
+    FreeSurfer:
+      CSF_label:
+      - 4
+      - 5
+      - 43
+      - 44
+      - 31
+      - 63
+      GM_label:
+      - 3
+      - 42
+      WM_label:
+      - 2
+      - 41
+      - 7
+      - 46
+      - 251
+      - 252
+      - 253
+      - 254
+      - 255
+      erode: 1
+    Template_Based:
+      CSF: $FSLDIR/data/standard/tissuepriors/2mm/avg152T1_csf_bin.nii.gz
+      GRAY: $FSLDIR/data/standard/tissuepriors/2mm/avg152T1_gray_bin.nii.gz
+      WHITE: $FSLDIR/data/standard/tissuepriors/2mm/avg152T1_white_bin.nii.gz
+      template_for_segmentation:
+      - T1_Template
+    using:
+    - FSL-FAST
+surface_analysis:
+  abcd_prefreesurfer_prep:
+    run: false
+  amplitude_low_frequency_fluctuation:
+    run: false
+  freesurfer:
+    ingress_reconall: true
+    reconall_args: -clean-bm -gcut
+    run_reconall: true
+  post_freesurfer:
+    fmri_res: 2
+    freesurfer_labels: /opt/dcan-tools/pipeline/global/config/FreeSurferAllLut.txt
+    gray_ordinates_dir: /opt/dcan-tools/pipeline/global/templates/Greyordinates
+    gray_ordinates_res: 2
+    high_res_mesh: 164
+    low_res_mesh: 32
+    run: false
+    smooth_fwhm: 2
+    subcortical_gray_labels: /opt/dcan-tools/pipeline/global/config/FreeSurferSubcorticalLabelTableLut.txt
+    surf_atlas_dir: /opt/dcan-tools/pipeline/global/templates/standard_mesh_atlases
+  regional_homogeneity:
+    run: false
+  surface_connectivity:
+    run: false
+    surface_parcellation_template: /cpac_templates/Schaefer2018_200Parcels_17Networks_order.dlabel.nii
+timeseries_extraction:
+  connectivity_matrix:
+    measure:
+    - Pearson
+    using:
+    - AFNI
+  realignment: ROI_to_func
+  run: true
+  tse_roi_paths:
+    /cpac_templates/CC200.nii.gz: Avg
+    /cpac_templates/CC400.nii.gz: Avg
+    /cpac_templates/PNAS_Smith09_rsn10.nii.gz: SpatialReg
+    /cpac_templates/Schaefer2018_space-FSLMNI152_res-2mm_desc-1000Parcels17NetworksOrder.nii.gz: Avg
+    /cpac_templates/Schaefer2018_space-FSLMNI152_res-2mm_desc-200Parcels17NetworksOrder.nii.gz: Avg
+    /cpac_templates/Schaefer2018_space-FSLMNI152_res-2mm_desc-300Parcels17NetworksOrder.nii.gz: Avg
+    /cpac_templates/Schaefer2018_space-FSLMNI152_res-2mm_desc-400Parcels17NetworksOrder.nii.gz: Avg
+    /cpac_templates/aal_mask_pad.nii.gz: Avg
+    /cpac_templates/ho_mask_pad.nii.gz: Avg
+    /cpac_templates/rois_3mm.nii.gz: Avg
+    /cpac_templates/tt_mask_pad.nii.gz: Avg
+    /ndmg_atlases/label/Human/AAL_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/Brodmann_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/CAPRSC_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/DKT_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/DesikanKlein_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/Desikan_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/Glasser_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/HarvardOxfordcort-maxprob-thr25_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/HarvardOxfordsub-maxprob-thr25_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/Juelich_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/MICCAI_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/Slab907_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/Talairach_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/Yeo-17-liberal_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/Yeo-17_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/Yeo-7-liberal_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+    /ndmg_atlases/label/Human/Yeo-7_space-MNI152NLin6_res-1x1x1.nii.gz: Avg
+voxel_mirrored_homotopic_connectivity:
+  run: false
+  symmetric_registration:
+    T1w_brain_template_symmetric: $FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_symmetric.nii.gz
+    T1w_brain_template_symmetric_for_resample: $FSLDIR/data/standard/MNI152_T1_1mm_brain_symmetric.nii.gz
+    T1w_brain_template_symmetric_funcreg: $FSLDIR/data/standard/MNI152_T1_${func_resolution}_brain_symmetric.nii.gz
+    T1w_template_symmetric: $FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_symmetric.nii.gz
+    T1w_template_symmetric_for_resample: $FSLDIR/data/standard/MNI152_T1_1mm_symmetric.nii.gz
+    T1w_template_symmetric_funcreg: $FSLDIR/data/standard/MNI152_T1_${func_resolution}_symmetric.nii.gz
+    dilated_symmetric_brain_mask: $FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask_symmetric_dil.nii.gz
+    dilated_symmetric_brain_mask_for_resample: $FSLDIR/data/standard/MNI152_T1_1mm_brain_mask_symmetric_dil.nii.gz
